@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 import torchaudio
-
+from dataclasses import dataclass
 import numpy as np
 import math
 import time
@@ -17,30 +17,32 @@ import argparse
 import wandb
 
 # hyperparameters
-parser = argparse.ArgumentParser()
-parser.add_argument("--batch_size", type=int, default=32)
-parser.add_argument("--epochs", type=int, default=100)
-parser.add_argument("--log_interval", type=int, default=100)
-parser.add_argument("-save", action="store_true")
-parser.add_argument("-gen_samples", action="store_true")
+@dataclass
+class TrainingConfig:
+    # Training parameters
+    batch_size: int = 32
+    epochs: int = 100
+    log_interval: int = 100
+    save: bool = False
+    gen_samples: bool = False
+    
+    # Model parameters
+    num_workers: int = 4
+    n_embeddings: int = 256
+    n_layers: int = 15
+    learning_rate: float = 3e-4
+    
+    # Wandb parameters
+    project_name: str = "wavenet-training"
+    run_name: str | None = None
 
-parser.add_argument("--num_workers", type=int, default=4)
-parser.add_argument("--n_embeddings", type=int, default=256,
-    help='number of embeddings')
-parser.add_argument("--n_layers", type=int, default=15)
-parser.add_argument("--learning_rate", type=float, default=3e-4)
-
-parser.add_argument("--project_name", type=str, default="wavenet-training",
-    help='wandb project name')
-parser.add_argument("--run_name", type=str, default=None,
-    help='wandb run name')
-
-args = parser.parse_args()
+# Create default config instance
+config = TrainingConfig()
 
 wandb.init(
-    project=args.project_name,
-    name=args.run_name,
-    config=vars(args)
+    project=config.project_name,
+    name=config.run_name,
+    config=vars(config)
 )
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
@@ -54,23 +56,23 @@ train_music_dataset = MusicDataset(dataset_path, transform=True)
 valid_music_dataset = MusicDataset(dataset_path, train=False, transform=True)
 
 train_loader = DataLoader(train_music_dataset, 
-                          batch_size=args.batch_size, 
+                          batch_size=config.batch_size, 
                           shuffle=True,
-                          num_workers=args.num_workers, 
+                          num_workers=config.num_workers, 
                           pin_memory=True)
 
 test_loader = DataLoader(valid_music_dataset, 
-                          batch_size=args.batch_size, 
+                          batch_size=config.batch_size, 
                           shuffle=True,
-                          num_workers=args.num_workers, 
+                          num_workers=config.num_workers, 
                           pin_memory=True)
 
 ## Loading model
-model = Wavenet(input_dim=args.n_embeddings, num_layers=args.n_layers)
+model = Wavenet(input_dim=config.n_embeddings, num_layers=config.n_layers)
 model.to(device)
 
 criterion = nn.CrossEntropyLoss()
-optim = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
+optim = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
 
 ## train , test and log
 
@@ -147,17 +149,17 @@ LAST_SAVED = -1
 
 os.makedirs('results', exist_ok=True)
 print("Training started")
-for epoch in range(1, args.epochs):
+for epoch in range(1, config.epochs):
     print("\nEpoch {}:".format(epoch))
     train()
     cur_loss = test()
 
-    if args.save or cur_loss <= BEST_LOSS:
+    if config.save or cur_loss <= BEST_LOSS:
         BEST_LOSS = cur_loss
         LAST_SAVED = epoch
 
         print("Saving model!")
-        torch.save(model.state_dict(), 'results/{}_wavenet.pt'.format(args.dataset))
+        torch.save(model.state_dict(), 'results/{}_wavenet.pt'.format(config.dataset))
         wandb.log({
             "best_val_loss": BEST_LOSS,
             "last_saved_epoch": LAST_SAVED
@@ -167,3 +169,42 @@ for epoch in range(1, args.epochs):
    
 wandb.finish()
    
+   
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser()
+    
+    # Training parameters
+    parser.add_argument("--batch_size", type=int, default=config.batch_size)
+    parser.add_argument("--epochs", type=int, default=config.epochs)
+    parser.add_argument("--log_interval", type=int, default=config.log_interval)
+    parser.add_argument("-save", action="store_true")
+    parser.add_argument("-gen_samples", action="store_true")
+    
+    # Model parameters
+    parser.add_argument("--num_workers", type=int, default=config.num_workers)
+    parser.add_argument("--n_embeddings", type=int, default=config.n_embeddings,
+        help='number of embeddings')
+    parser.add_argument("--n_layers", type=int, default=config.n_layers)
+    parser.add_argument("--learning_rate", type=float, default=config.learning_rate)
+    
+    # Wandb parameters
+    parser.add_argument("--project_name", type=str, default=config.project_name,
+        help='wandb project name')
+    parser.add_argument("--run_name", type=str, default=config.run_name,
+        help='wandb run name')
+    
+    args = parser.parse_args()
+    
+    # Update config with command line arguments
+    config.batch_size = args.batch_size
+    config.epochs = args.epochs
+    config.log_interval = args.log_interval
+    config.save = args.save
+    config.gen_samples = args.gen_samples
+    config.num_workers = args.num_workers
+    config.n_embeddings = args.n_embeddings
+    config.n_layers = args.n_layers
+    config.learning_rate = args.learning_rate
+    config.project_name = args.project_name
+    config.run_name = args.run_name

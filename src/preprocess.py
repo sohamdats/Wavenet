@@ -2,20 +2,20 @@ import torch
 import torch.nn as nn
 from torch.utils.data import Dataset
 import torchaudio
-
+from dataclasses import dataclass
 import math
 import os
 import glob
 
 # hyperparameters
-import argparse
-parser = argparse.ArgumentParser()
+@dataclass
+class Config:
+    chunk_size: int = 16000
+    hop_size: int = 8000
+    split: float = 0.8
 
-parser.add_argument("--chunk_size", type=int, default=16000)
-parser.add_argument("--hop_size", type=int, default=8000)
-parser.add_argument("--split", type=float, default=0.8)
-
-args = parser.parse_args()
+# Use this config instance throughout your code
+config = Config()
 
 class MusicDataset(Dataset):
     
@@ -38,10 +38,10 @@ class MusicDataset(Dataset):
             self.mu_law = torchaudio.transforms.MuLawEncoding(quantization_channels=256)
             
             chunks = []
-            chunk_size = args.chunk_size
-            hop_size = args.hop_size
+            chunk_size = config.chunk_size
+            hop_size = config.hop_size
             
-            cut_off = int(len(files) * args.split)
+            cut_off = int(len(files) * config.split)
             
             if train:    
                 files = files[:cut_off]
@@ -83,3 +83,19 @@ class MusicDataset(Dataset):
         return self.chunks[idx]
    
     
+    
+if __name__ == "__main__":
+    
+    
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--chunk_size", type=int, default=config.chunk_size)
+    parser.add_argument("--hop_size", type=int, default=config.hop_size)
+    parser.add_argument("--split", type=float, default=config.split)
+    
+    args = parser.parse_args()
+    
+    # Update config with command line arguments
+    config.chunk_size = args.chunk_size
+    config.hop_size = args.hop_size
+    config.split = args.split
