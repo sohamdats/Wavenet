@@ -13,6 +13,7 @@ def weights_init(m):
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
         try:
+            device = m.weight.device  # Get the current device of the module
             nn.init.xavier_uniform_(m.weight.data)
             m.bias.data.fill_(0)
         except AttributeError:
