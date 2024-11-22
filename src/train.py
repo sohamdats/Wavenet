@@ -147,6 +147,7 @@ BEST_LOSS = 999
 LAST_SAVED = -1
 
 os.makedirs('results', exist_ok=True)
+print("Training started")
 for epoch in range(1, args.epochs):
     print("\nEpoch {}:".format(epoch))
     train()

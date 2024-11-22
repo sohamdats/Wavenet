@@ -77,7 +77,7 @@ class MusicDataset(Dataset):
             self.chunks.extend([(chunk, torch.tensor([[genre_idx]], dtype=torch.long)) for chunk in chunks])
             
     def __len__(self):
-        return len(self.audio_files)
+        return len(self.chunks)
     
     def __getitem__(self, idx):
         return self.chunks[idx]
