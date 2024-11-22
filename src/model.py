@@ -5,7 +5,6 @@ import torchaudio
 from torch.utils.data import Dataset, DataLoader
 
 import numpy as np
-import matplotlib.pyplot as plt
 import math
 
 import os

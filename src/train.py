@@ -5,7 +5,6 @@ from torch.utils.data import DataLoader
 import torchaudio
 
 import numpy as np
-import matplotlib.pyplot as plt
 import math
 import time
 import os
