@@ -102,7 +102,6 @@ def train():
         
         loss = criterion(logits.view(-1, logits.size(-1)), x.view(-1))
         
-        del x, label, output, logits
         optim.zero_grad()
         loss.backward()
         optim.step()
