@@ -102,11 +102,14 @@ def train():
         
         loss = criterion(logits.view(-1, logits.size(-1)), x.view(-1))
         
+        del x, label, output, logits
         optim.zero_grad()
         loss.backward()
         optim.step()
         
         train_loss.append(loss.item())
+        
+        del x, label, output, logits
         
         if (batch_idx + 1) % config.log_interval == 0:
             avg_loss = np.asarray(train_loss)[-config.log_interval:].mean(0)
@@ -136,11 +139,14 @@ def test():
                     
             loss = criterion(logits.view(-1, logits.size(-1)), x.view(-1))
             
+            
             optim.zero_grad()
             loss.backward()
             optim.step()
             
             val_loss.append(loss.item())
+            
+            del x, label, output, logits
 
     val_loss = np.asarray(val_loss).mean(0)
     wandb.log({
