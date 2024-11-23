@@ -106,7 +106,7 @@ class Wavenet(nn.Module):
             
         self.final_gate = GatedNetwork()
         
-        self.apply(weights_init)
+        # self.apply(weights_init)
 
     def forward(self, x, label):
         
