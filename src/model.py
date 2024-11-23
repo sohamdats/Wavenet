@@ -52,7 +52,7 @@ class DilatedConvBlock(nn.Module):
         super().__init__()
         
         self.padding = (kernel_size - 1) * dilation
-        self.dilat_conv = nn.Conv2d(dim * 2, 
+        self.dilat_conv = nn.Conv2d(dim, 
                                     dim * 2, 
                                     (1, kernel_size), 
                                     1, 
@@ -60,15 +60,15 @@ class DilatedConvBlock(nn.Module):
                                     dilation=dilation)
 
         self.gate = GatedNetwork()
-        self.expand_conv = nn.Conv2d(dim, dim*2, 1)
+        # self.expand_conv = nn.Conv2d(dim, dim*2, 1)
         
         self.class_cond_embedding = nn.Embedding(n_classes, dim*2)
 
     def forward(self, x, label):
         
         h_label = self.class_cond_embedding(label)
-        h = self.expand_conv(x)
-        h_temp = F.pad(h, (self.padding, 0))
+        # h = self.expand_conv(x)
+        h_temp = F.pad(x, (self.padding, 0))
         h = self.dilat_conv(h_temp)
 
         output = self.gate(h + h_label[:, :, None, None]) + x
