@@ -74,7 +74,7 @@ class MusicDataset(Dataset):
                         
                     chunks.append(chunk)
                     
-            self.chunks.extend([(chunk, torch.tensor([[genre_idx]], dtype=torch.long)) for chunk in chunks])
+            self.chunks.extend([(chunk, genre_idx) for chunk in chunks])
             
     def __len__(self):
         return len(self.chunks)

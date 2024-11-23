@@ -138,7 +138,6 @@ class Wavenet(nn.Module):
             for  j in range(shape[1]):
                 
                 logits = self.forward(x, label)
-              
                 probs = F.softmax(logits[:, :, i, j], dim=-1)
                 x.data[:, i, j].copy_(
                     probs.multinomial(1).squeeze().data
