@@ -97,15 +97,15 @@ def train():
         
         train_loss.append(loss.item())
         
-        if (batch_idx + 1) % args.log_interval == 0:
-            avg_loss = np.asarray(train_loss)[-args.log_interval:].mean(0)
+        if (batch_idx + 1) % config.log_interval == 0:
+            avg_loss = np.asarray(train_loss)[-config.log_interval:].mean(0)
             wandb.log({
                 "train_loss": avg_loss,
                 "train_step": batch_idx * len(x)
             })
             print('\tIter: [{}/{} ({:.0f}%)]\tLoss: {} Time: {}'.format(
                 batch_idx * len(x), len(train_loader.dataset),
-                args.log_interval * batch_idx / len(train_loader),
+                config.log_interval * batch_idx / len(train_loader),
                 avg_loss,
                 time.time() - start_time
             ))
