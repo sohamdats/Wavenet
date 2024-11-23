@@ -84,7 +84,7 @@ def train():
     for batch_idx, (x, label) in enumerate(train_loader):
         
         x = x.to(device)
-        label = label.to(device)
+        label = label.long().to(device)
         
         output = model(x, label)
         logits = output.permute(0, 2, 3, 1).contiguous()

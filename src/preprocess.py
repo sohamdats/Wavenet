@@ -19,7 +19,7 @@ config = Config()
 
 class MusicDataset(Dataset):
     
-    def __init__(self, filepath, train=True, transform=False):
+    def __init__(self, filepath, train=True, transform=True):
         
         genre_files = {}
         for genere_fol in os.listdir(filepath):
