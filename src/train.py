@@ -55,17 +55,28 @@ dataset_path = os.path.join("..", "data", "genrenew")
 train_music_dataset = MusicDataset(dataset_path, transform=True)
 valid_music_dataset = MusicDataset(dataset_path, train=False, transform=True)
 
+# train_loader = DataLoader(train_music_dataset, 
+#                           batch_size=config.batch_size, 
+#                           shuffle=True,
+#                           num_workers=config.num_workers, 
+#                           pin_memory=True)
+
+# test_loader = DataLoader(valid_music_dataset, 
+#                           batch_size=config.batch_size, 
+#                           shuffle=True,
+#                           num_workers=config.num_workers, 
+#                           pin_memory=True)
+
 train_loader = DataLoader(train_music_dataset, 
                           batch_size=config.batch_size, 
                           shuffle=True,
-                          num_workers=config.num_workers, 
-                          pin_memory=True)
+                          )
 
 test_loader = DataLoader(valid_music_dataset, 
                           batch_size=config.batch_size, 
                           shuffle=True,
-                          num_workers=config.num_workers, 
-                          pin_memory=True)
+                          )
+
 
 ## Loading model
 model = Wavenet(input_dim=config.n_embeddings, num_layers=config.n_layers)
