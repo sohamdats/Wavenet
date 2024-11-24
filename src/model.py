@@ -25,18 +25,18 @@ class GatedNetwork(nn.Module):
         
     def forward(self, x):      
         
-        # if torch.isnan(x).any():
-        #     raise ValueError("Input contains NaN values")
-        # if torch.isinf(x).any():
-        #     raise ValueError("Input contains inf values")
+        if torch.isnan(x).any():
+            raise ValueError("Input contains NaN values")
+        if torch.isinf(x).any():
+            raise ValueError("Input contains inf values")
             
-        # # Print shape and value ranges for debugging
-        # print(f"Gate input shape: {x.shape}")
-        # print(f"Input range: [{x.min().item():.4f}, {x.max().item():.4f}]")
+        # Print shape and value ranges for debugging
+        print(f"Gate input shape: {x.shape}")
+        print(f"Input range: [{x.min().item():.4f}, {x.max().item():.4f}]")
         
-        # # Check if tensor has correct shape
-        # if x.shape[1] % 2 != 0:
-        #     raise ValueError(f"Channel dimension must be even, got {x.shape[1]}")
+        # Check if tensor has correct shape
+        if x.shape[1] % 2 != 0:
+            raise ValueError(f"Channel dimension must be even, got {x.shape[1]}")
         
         
         x, y = x.chunk(2, dim=1)
