@@ -50,7 +50,7 @@ class MusicDataset(Dataset):
             
             for file in files:
 
-                waveform, _  = torchaudio.load(file)
+                waveform, _  = torchaudio.load(file, normalize=True)
 
                 if waveform.shape[0] == 2:
                     waveform = torch.mean(waveform, dim=0, keepdim=True)
