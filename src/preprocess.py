@@ -56,7 +56,7 @@ class MusicDataset(Dataset):
                     waveform = torch.mean(waveform, dim=0, keepdim=True)
                 
                 if self.transform:
-                    waveform = self.mu_law(waveform)
+                    waveform = self.mu_law(waveform) - 1 # to set the range [0, 255]
                     
                 num_chunks = int(math.ceil(waveform.shape[1]  / hop_size))
                 
