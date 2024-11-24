@@ -66,13 +66,16 @@ class DilatedConvBlock(nn.Module):
 
     def forward(self, x, label):
         
+        input_x = x
+        
         h_label = self.class_cond_embedding(label)
-        # h = self.expand_conv(x)
-        h_temp = F.pad(x, (self.padding, 0))
+        h_temp = F.pad(x, (self.padding, 0))  
         h = self.dilat_conv(h_temp)
 
-        output = self.gate(h + h_label[:, :, None, None]) + x
-        return output
+        h = h[:, :, :, :input_x.size(-1)]
+       
+        output = self.gate(h + h_label[:, :, None, None])
+        return output + input_x
 
         
 class Wavenet(nn.Module):
